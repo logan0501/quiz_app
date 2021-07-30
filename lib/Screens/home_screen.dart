@@ -13,50 +13,54 @@ class SecondScreen extends StatefulWidget {
 }
 
 class _SecondScreenState extends State<SecondScreen> {
-  List<dynamic> res = [];
-
   Future<List<dynamic>> getdata() async {
     var url = Uri.parse('http://perceptiondraft.com/api/gbas00721-cat.php');
     var response = await http.get(url);
-    if (response.statusCode == 200) {
-      print(response.body);
 
-      var jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
-      return jsonResponse;
-    }
-    return [];
+    var jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
+    return jsonResponse;
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          child: Column(
-            children: [
-              Center(
-                child: Image(
-                  height: MediaQuery.of(context).size.height * 0.06,
-                  image: AssetImage('assets/logo.png'),
-                ),
+        body: Column(
+          children: [
+            Center(
+              child: Image(
+                height: MediaQuery.of(context).size.height * 0.06,
+                image: AssetImage('assets/logo.png'),
               ),
-              SizedBox(height: 20),
-              Center(
-                child: Text('Available Quiz'),
-              ),
-              Expanded(
-                  child: FutureBuilder(
-                future: getdata(),
-                builder: (context, snapshots) {
-                  if (snapshots.connectionState == ConnectionState.waiting) {
-                    return Text('loading');
-                  }
-                  List<dynamic> post = snapshots.data as List<dynamic>;
-                  res = post;
-                  return ListView.builder(
-                      itemCount: post.length,
-                      itemBuilder: (context, index) {
-                        return Container(
+            ),
+            SizedBox(height: 20),
+            Center(
+              child: Text('Available Quiz'),
+            ),
+            Expanded(
+                child: FutureBuilder(
+              future: getdata(),
+              builder: (context, snapshots) {
+                if (snapshots.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                List<dynamic> post = snapshots.data as List<dynamic>;
+
+                return ListView.builder(
+                    itemCount: post.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      QuizScreen(post[index]['apilink'])));
+                        },
+                        child: Container(
+                          key: Key(post[index]['id'].toString()),
                           decoration: BoxDecoration(
                               boxShadow: [
                                 BoxShadow(
@@ -112,39 +116,39 @@ class _SecondScreenState extends State<SecondScreen> {
                               )
                             ],
                           ),
-                        );
-                      });
-                },
-              )),
-              Spacer(),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              QuizScreen(res.elementAt(0)['apilink'])));
-                },
-                child: Container(
-                  margin: EdgeInsets.all(20),
-                  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 10),
-                  decoration: BoxDecoration(
-                      color: Color(0xff53CE34),
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: Text(
-                    'Instant Quiz',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                        ),
+                      );
+                    });
+              },
+            )),
+            Spacer(),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => QuizScreen(
+                            "http:\/\/perceptiondraft.com\/api\/gbas00721-quiz.php?cid=1")));
+              },
+              child: Container(
+                margin: EdgeInsets.all(20),
+                padding: EdgeInsets.symmetric(horizontal: 100, vertical: 10),
+                decoration: BoxDecoration(
+                    color: Color(0xff53CE34),
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: Text(
+                  'Instant Quiz',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
-              Container(
-                  margin: EdgeInsets.only(bottom: 20),
-                  child: Text(
-                    'Candidate ID : Loganathan_logan05012001@gmail.com',
-                    style: TextStyle(fontSize: 10),
-                  )),
-            ],
-          ),
+            ),
+            Container(
+                margin: EdgeInsets.only(bottom: 20),
+                child: Text(
+                  'Candidate ID : Loganathan_logan05012001@gmail.com',
+                  style: TextStyle(fontSize: 10),
+                )),
+          ],
         ),
       ),
     );
